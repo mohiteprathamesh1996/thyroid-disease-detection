@@ -1,6 +1,6 @@
 from datetime import datetime
 import os
-from sensor.constant import training_pipeline
+from thyroid.constant import training_pipeline
 
 
 class TrainingPipelineConfig:

@@ -6,7 +6,7 @@ from sklearn.model_selection import train_test_split
 import os
 import sys
 from pandas import DataFrame
-from thyroid.data_access.sensor_data import SensorData
+from thyroid.data_access.thyroid_data import ThyroidData
 from thyroid.utils.main_utils import read_yaml_file
 from thyroid.constant.training_pipeline import SCHEMA_FILE_PATH
 
@@ -26,7 +26,7 @@ class DataIngestion:
         """
         try:
             logging.info("Exporting data from mongodb to feature store")
-            sensor_data = SensorData()
+            sensor_data = ThyroidData()
             dataframe = sensor_data.export_collection_as_dataframe(
                 collection_name=self.data_ingestion_config.collection_name
             )
@@ -84,10 +84,14 @@ class DataIngestion:
     def initiate_data_ingestion(self) -> DataIngestionArtifact:
         try:
             dataframe = self.export_data_into_feature_store()
-            dataframe = dataframe.drop(
-                self._schema_config["drop_columns"], 
-                axis=1
-                )
+            try:
+                dataframe = dataframe.drop(
+                    self._schema_config["drop_columns"],
+                    axis=1
+                    )
+                    
+            except:
+                pass
             self.split_data_as_train_test(dataframe=dataframe)
             data_ingestion_artifact = DataIngestionArtifact(
                 trained_file_path=self.data_ingestion_config.training_file_path,
