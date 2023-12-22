@@ -1,0 +1,27 @@
+columns:
+- Target: object
+- age: float64
+- sex: object
+- on_thyroxine: object
+- query_on_thyroxine: object
+- on_antithyroid_medication: object
+- thyroid_surgery: object
+- query_hypothyroid: object
+- query_hyperthyroid: object
+- pregnant: object
+- sick: object
+- tumor: object
+- lithium: object
+- goitre: object
+- TSH_measured: object
+- TSH: float64
+- T3_measured: object
+- T3: float64
+- TT4_measured: object
+- TT4: float64
+- T4U_measured: object
+- T4U: float64
+- FTI_measured: object
+- FTI: float64
+- TBG_measured: object
+- TBG: float64
