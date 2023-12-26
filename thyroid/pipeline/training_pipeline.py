@@ -2,24 +2,26 @@ from thyroid.entity.config_entity import (
     TrainingPipelineConfig,
     DataIngestionConfig, 
     DataValidationConfig,
-    DataTransformationConfig
+    DataTransformationConfig,
+    ModelTrainerConfig
 )
-
-
-from thyroid.exception import ThyroidException
-from thyroid.logger import logging
 
 from thyroid.entity.artifact_entity import (
     DataIngestionArtifact, 
     DataValidationArtifact,
-    DataTransformationArtifact
+    DataTransformationArtifact,
+    ModelTrainerArtifact
 )
+
+from thyroid.exception import ThyroidException
+from thyroid.logger import logging
 
 from thyroid.component.data_ingestion import DataIngestion
 from thyroid.component.data_validation import DataValidation
 from thyroid.component.data_transformation import DataTransformation
+from thyroid.component.model_trainer import ModelTrainer
 
-import os
+
 import sys
 
 
@@ -86,6 +88,28 @@ class TrainPipeline:
         except Exception as e:
             raise ThyroidException(e, sys)
 
+    
+    def start_model_trainer(
+            self,
+            data_transformation_artifact:DataTransformationArtifact
+            ):
+        try:
+            model_trainer_config = ModelTrainerConfig(
+                training_pipeline_config=self.training_pipeline_config
+                )
+            
+            model_trainer = ModelTrainer(
+                model_trainer_config, 
+                data_transformation_artifact
+                )
+            
+            model_trainer_artifact = model_trainer.initiate_model_trainer()
+        
+            return model_trainer_artifact
+        
+        except  Exception as e:
+            raise  ThyroidException(e,sys)
+
     def run_pipeline(self):
         try:
             data_ingestion_artifact = self.start_data_ingestion()
@@ -96,6 +120,10 @@ class TrainPipeline:
             
             data_transformation_artifact = self.start_data_transformation(
                 data_validation_artifact=data_validation_artifact
+                )
+            
+            model_trainer_artifact = self.start_model_trainer(
+                data_transformation_artifact=data_transformation_artifact
                 )
 
         except Exception as e:
