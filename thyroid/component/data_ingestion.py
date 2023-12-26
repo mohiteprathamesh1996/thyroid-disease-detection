@@ -5,6 +5,7 @@ from thyroid.entity.artifact_entity import DataIngestionArtifact
 from sklearn.model_selection import train_test_split
 import os
 import sys
+import numpy as np
 from pandas import DataFrame
 from thyroid.data_access.thyroid_data import ThyroidData
 from thyroid.utils.main_utils import read_yaml_file
@@ -29,7 +30,8 @@ class DataIngestion:
             sensor_data = ThyroidData()
             dataframe = sensor_data.export_collection_as_dataframe(
                 collection_name=self.data_ingestion_config.collection_name
-            )
+                )
+            
             feature_store_file_path = self.data_ingestion_config.feature_store_file_path
 
             # creating folder
@@ -79,7 +81,7 @@ class DataIngestion:
 
             logging.info(f"Exported train and test file path.")
         except Exception as e:
-            raise SensorData(e, sys)
+            raise ThyroidException(e, sys)
 
     def initiate_data_ingestion(self) -> DataIngestionArtifact:
         try:
