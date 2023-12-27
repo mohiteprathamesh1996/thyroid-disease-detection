@@ -77,7 +77,7 @@ class ModelTrainer:
                 y_pred=y_test_pred
             )
 
-            #Overfitting and Underfitting
+            # Overfitting and Underfitting
             diff = abs(classification_train_metric.f1_score -
                        classification_test_metric.f1_score)
 

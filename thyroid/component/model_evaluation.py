@@ -106,7 +106,7 @@ class ModelEvaluation:
             improved_accuracy = trained_metric.f1_score - latest_metric.f1_score
 
             if self.model_eval_config.change_threshold < improved_accuracy:
-                #0.02 < 0.03
+                # 0.02 < 0.03
                 is_model_accepted = True
             else:
                 is_model_accepted = False
