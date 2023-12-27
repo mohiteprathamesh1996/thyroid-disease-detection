@@ -2,10 +2,12 @@
 import yaml
 from thyroid.exception import ThyroidException
 from thyroid.logger import logging
-import os,sys
+import os
+import sys
 import numpy as np
 import pandas as pd
 import dill
+
 
 def read_yaml_file(file_path: str) -> dict:
     try:
@@ -15,7 +17,8 @@ def read_yaml_file(file_path: str) -> dict:
         raise ThyroidException(e, sys) from e
 
 
-def write_yaml_file(file_path: str, content: object, replace: bool = False) -> None:
+def write_yaml_file(file_path: str, content: object,
+                    replace: bool = False) -> None:
     try:
         if replace:
             if os.path.exists(file_path):
@@ -25,7 +28,6 @@ def write_yaml_file(file_path: str, content: object, replace: bool = False) -> N
             yaml.dump(content, file)
     except Exception as e:
         raise ThyroidException(e, sys)
-
 
 
 def save_numpy_array_data(file_path: str, array: np.array):

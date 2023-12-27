@@ -3,11 +3,12 @@ from thyroid.utils.main_utils import load_numpy_array_data
 from thyroid.exception import ThyroidException
 from thyroid.logger import logging
 from thyroid.entity.artifact_entity import (
-    DataTransformationArtifact, 
+    DataTransformationArtifact,
     ModelTrainerArtifact
-    )
+)
 from thyroid.entity.config_entity import ModelTrainerConfig
-import os,sys
+import os
+import sys
 from xgboost import XGBClassifier
 from thyroid.ml.metric.classification_metric import get_classification_score
 from thyroid.ml.model.estimator import ThyroidModel
@@ -16,40 +17,39 @@ from thyroid.utils.main_utils import save_object, load_object
 
 class ModelTrainer:
 
-    def __init__(self,model_trainer_config:ModelTrainerConfig,
-        data_transformation_artifact:DataTransformationArtifact):
+    def __init__(self, model_trainer_config: ModelTrainerConfig,
+                 data_transformation_artifact: DataTransformationArtifact):
         try:
-            self.model_trainer_config=model_trainer_config
-            self.data_transformation_artifact=data_transformation_artifact
+            self.model_trainer_config = model_trainer_config
+            self.data_transformation_artifact = data_transformation_artifact
         except Exception as e:
-            raise ThyroidException(e,sys)
+            raise ThyroidException(e, sys)
 
- 
-    def train_model(self,x_train,y_train):
+    def train_model(self, x_train, y_train):
         try:
             xgb_clf = GridSearchCV(
-                estimator=XGBClassifier(), 
+                estimator=XGBClassifier(),
                 param_grid={
                     'n_estimators': [100, 200, 300],
                     'max_depth': [3, 4, 5],
                     'learning_rate': [0.1, 0.01, 0.001]
-                    }, 
-                cv=3, 
-                scoring='accuracy', 
+                },
+                cv=3,
+                scoring='accuracy',
                 verbose=2
-                )
+            )
 
-            xgb_clf.fit(x_train,y_train)
+            xgb_clf.fit(x_train, y_train)
             return xgb_clf
         except Exception as e:
             raise e
-    
-    def initiate_model_trainer(self)->ModelTrainerArtifact:
+
+    def initiate_model_trainer(self) -> ModelTrainerArtifact:
         try:
             train_file_path = self.data_transformation_artifact.transformed_train_file_path
             test_file_path = self.data_transformation_artifact.transformed_test_file_path
 
-            #loading training array and testing array
+            # loading training array and testing array
             train_arr = load_numpy_array_data(train_file_path)
             test_arr = load_numpy_array_data(test_file_path)
 
@@ -62,51 +62,53 @@ class ModelTrainer:
 
             model = self.train_model(x_train, y_train)
             y_train_pred = model.predict(x_train)
-            classification_train_metric =  get_classification_score(
-                y_true = y_train, 
-                y_pred = y_train_pred
-                )
-            
-            if classification_train_metric.f1_score<=self.model_trainer_config.expected_accuracy:
-                raise Exception("Trained model is not good to provide expected accuracy")
-            
+            classification_train_metric = get_classification_score(
+                y_true=y_train,
+                y_pred=y_train_pred
+            )
+
+            if classification_train_metric.f1_score <= self.model_trainer_config.expected_accuracy:
+                raise Exception(
+                    "Trained model is not good to provide expected accuracy")
 
             y_test_pred = model.predict(x_test)
             classification_test_metric = get_classification_score(
-                y_true = y_test,
-                y_pred = y_test_pred
-                )
-
+                y_true=y_test,
+                y_pred=y_test_pred
+            )
 
             #Overfitting and Underfitting
-            diff = abs(classification_train_metric.f1_score-classification_test_metric.f1_score)
-            
-            if diff>self.model_trainer_config.overfitting_underfitting_threshold:
-                raise Exception("Model is not good try to do more experimentation.")
+            diff = abs(classification_train_metric.f1_score -
+                       classification_test_metric.f1_score)
+
+            if diff > self.model_trainer_config.overfitting_underfitting_threshold:
+                raise Exception(
+                    "Model is not good try to do more experimentation.")
 
             preprocessor = load_object(
-                file_path = self.data_transformation_artifact.transformed_object_file_path
-                )
-            
-            model_dir_path = os.path.dirname(self.model_trainer_config.trained_model_file_path)
-            os.makedirs(model_dir_path,exist_ok=True)
-            sensor_model = ThyroidModel(preprocessor=preprocessor,model=model)
+                file_path=self.data_transformation_artifact.transformed_object_file_path
+            )
+
+            model_dir_path = os.path.dirname(
+                self.model_trainer_config.trained_model_file_path)
+            os.makedirs(model_dir_path, exist_ok=True)
+            sensor_model = ThyroidModel(preprocessor=preprocessor, model=model)
 
             save_object(
-                self.model_trainer_config.trained_model_file_path, 
+                self.model_trainer_config.trained_model_file_path,
                 obj=sensor_model
-                )
+            )
 
             # Creating model trainer artifacts
             model_trainer_artifact = ModelTrainerArtifact(
-                trained_model_file_path = self.model_trainer_config.trained_model_file_path, 
-                train_metric_artifact = classification_train_metric,
-                test_metric_artifact = classification_test_metric
-                )
-            
+                trained_model_file_path=self.model_trainer_config.trained_model_file_path,
+                train_metric_artifact=classification_train_metric,
+                test_metric_artifact=classification_test_metric
+            )
+
             logging.info(f"Model trainer artifact: {model_trainer_artifact}")
 
             return model_trainer_artifact
-        
+
         except Exception as e:
-            raise ThyroidException(e,sys)
+            raise ThyroidException(e, sys)

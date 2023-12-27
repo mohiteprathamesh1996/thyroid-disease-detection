@@ -1,9 +1,11 @@
 from dataclasses import dataclass
 
+
 @dataclass
 class DataIngestionArtifact:
     trained_file_path: str
     test_file_path: str
+
 
 @dataclass
 class DataValidationArtifact:
@@ -14,11 +16,13 @@ class DataValidationArtifact:
     invalid_test_file_path: str
     drift_report_file_path: str
 
+
 @dataclass
 class DataTransformationArtifact:
     transformed_object_file_path: str
     transformed_train_file_path: str
     transformed_test_file_path: str
+
 
 @dataclass
 class ClassificationMetricArtifact:
@@ -26,11 +30,13 @@ class ClassificationMetricArtifact:
     precision_score: float
     recall_score: float
 
+
 @dataclass
 class ModelTrainerArtifact:
     trained_model_file_path: str
     train_metric_artifact: ClassificationMetricArtifact
     test_metric_artifact: ClassificationMetricArtifact
+
 
 @dataclass
 class ModelEvaluationArtifact:
@@ -41,8 +47,8 @@ class ModelEvaluationArtifact:
     train_model_metric_artifact: ClassificationMetricArtifact
     best_model_metric_artifact: ClassificationMetricArtifact
 
+
 @dataclass
 class ModelPusherArtifact:
-    saved_model_path:str
-    model_file_path:str
-    
+    saved_model_path: str
+    model_file_path: str

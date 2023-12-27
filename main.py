@@ -84,14 +84,14 @@ async def predict_route(file: UploadFile = File(...)):
 
         if not model_resolver.is_model_exists():
             return Response("Model is not available")
-        
+
         config_schema = read_yaml_file(file_path=SCHEMA_FILE_PATH)
-            
+
         str_cols = [
             list(i.keys())[0] for i in config_schema["columns"]
-            if i[list(i.keys())[0]]=="object"
-            ]
-            
+            if i[list(i.keys())[0]] == "object"
+        ]
+
         str_cols.remove(TARGET_COLUMN)
 
         best_model_path = model_resolver.get_best_model_path()
@@ -102,12 +102,12 @@ async def predict_route(file: UploadFile = File(...)):
             pd.get_dummies(
                 data=df.replace("?", np.nan),
                 columns=str_cols
-                )[
-                    list(
-                        model.preprocessor.feature_names_in_
-                        )
-                        ]
-                        )
+            )[
+                list(
+                    model.preprocessor.feature_names_in_
+                )
+            ]
+        )
 
     except Exception as e:
         return Response(f"Error Occurred! {e}")

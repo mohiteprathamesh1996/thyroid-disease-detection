@@ -30,8 +30,8 @@ class DataIngestion:
             sensor_data = ThyroidData()
             dataframe = sensor_data.export_collection_as_dataframe(
                 collection_name=self.data_ingestion_config.collection_name
-                )
-            
+            )
+
             feature_store_file_path = self.data_ingestion_config.feature_store_file_path
 
             # creating folder
@@ -49,7 +49,7 @@ class DataIngestion:
 
         try:
             train_set, test_set = train_test_split(
-                dataframe, 
+                dataframe,
                 test_size=self.data_ingestion_config.train_test_split_ratio
             )
 
@@ -61,22 +61,22 @@ class DataIngestion:
 
             dir_path = os.path.dirname(
                 self.data_ingestion_config.training_file_path
-                )
+            )
 
             os.makedirs(dir_path, exist_ok=True)
 
             logging.info(f"Exporting train and test file path.")
 
             train_set.to_csv(
-                self.data_ingestion_config.training_file_path, 
-                index=False, 
+                self.data_ingestion_config.training_file_path,
+                index=False,
                 header=True
             )
 
             test_set.to_csv(
                 self.data_ingestion_config.testing_file_path,
-                 index=False,
-                  header=True
+                index=False,
+                header=True
             )
 
             logging.info(f"Exported train and test file path.")
@@ -90,9 +90,9 @@ class DataIngestion:
                 dataframe = dataframe.drop(
                     self._schema_config["drop_columns"],
                     axis=1
-                    )
-                    
-            except:
+                )
+
+            except BaseException:
                 pass
             self.split_data_as_train_test(dataframe=dataframe)
             data_ingestion_artifact = DataIngestionArtifact(
