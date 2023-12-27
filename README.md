@@ -10,20 +10,45 @@ This repository contains a data science project aiming to predict the risk of th
     cd thyroid-disease-prediction
     ```
 
-2. Install dependencies (if any):
+2. Create a virtual conda environment using terminal:
+
+    ```bash
+    conda create -p venv python=3.8 -y
+    ```
+
+    And the activate using:
+
+    ```bash
+    conda activate venv/
+    ```
+
+3. Install dependencies (if any):
 
     ```bash
     pip install -r requirements.txt
     ```
 
-3. Follow the Jupyter notebooks in the `notebooks/` directory in numerical order to understand the project workflow.
+4. Create .env file to save all environment variables:
 
-## Directory Structure
+ In the terminal window execute the following window
+    
+    ```bash
+    touch .env
+    ```
 
-- `data/`: Contains the dataset used for training and testing.
-- `notebooks/`: Jupyter notebooks for each step of the data science process.
-- `scripts/`: Any additional scripts used in data preprocessing or model evaluation.
-- `results/`: Stores model evaluation metrics, visualizations, and any other output.
+    Open the .env you created and add the MongoDB connection string
+
+    ```bash
+    MONGO_DB_URL=<Enter your connection string>
+    ```
+
+5. Run the entire source code in the terminal using:
+
+    ```bash
+    python main.py
+    ```
+
+
 
 ## Contributing
 
