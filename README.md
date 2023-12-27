@@ -32,6 +32,7 @@ This repository contains a data science project aiming to predict the risk of th
     touch .env
     
     MONGO_DB_URL=<Enter your connection string>
+    ```
     
 
 5. Run the entire source code in the terminal using:
