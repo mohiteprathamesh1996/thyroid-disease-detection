@@ -30,13 +30,9 @@ This repository contains a data science project aiming to predict the risk of th
     
     ```bash
     touch .env
-    ```
-
-    Open the .env you created and add the MongoDB connection string
-
-    ```bash
+    
     MONGO_DB_URL=<Enter your connection string>
-    ```
+    
 
 5. Run the entire source code in the terminal using:
 
