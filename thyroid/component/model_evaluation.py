@@ -8,14 +8,20 @@ from thyroid.entity.artifact_entity import (
     )
 
 from thyroid.entity.config_entity import ModelEvaluationConfig
-import os,sys
+import sys
 from thyroid.ml.metric.classification_metric import get_classification_score
 from thyroid.ml.model.estimator import ThyroidModel
-from thyroid.utils.main_utils import save_object, load_object, write_yaml_file
+from thyroid.utils.main_utils import (
+    load_object, 
+    write_yaml_file, 
+    read_yaml_file
+    )
+
 from thyroid.ml.model.estimator import ModelResolver
-from thyroid.constant.training_pipeline import TARGET_COLUMN
+from thyroid.constant.training_pipeline import TARGET_COLUMN, SCHEMA_FILE_PATH
 from thyroid.ml.model.estimator import TargetValueMapping
 import pandas as pd
+import numpy as np
 
 
 class ModelEvaluation:
@@ -72,9 +78,29 @@ class ModelEvaluation:
             latest_model_path = model_resolver.get_best_model_path()
             latest_model = load_object(file_path=latest_model_path)
             train_model = load_object(file_path=train_model_file_path)
+
+            config_schema = read_yaml_file(file_path=SCHEMA_FILE_PATH)
             
-            y_trained_pred = train_model.predict(df)
-            y_latest_pred  = latest_model.predict(df)
+            str_cols = [
+                list(i.keys())[0] for i in config_schema["columns"]
+                if i[list(i.keys())[0]]=="object"
+                ]
+            
+            str_cols.remove(TARGET_COLUMN)
+            
+            y_trained_pred = train_model.predict(
+                pd.get_dummies(
+                    data=df.replace("?", np.nan),
+                    columns=str_cols
+                    )[list(train_model.preprocessor.feature_names_in_)]
+                    )
+            
+            y_latest_pred  = latest_model.predict(
+                pd.get_dummies(
+                    data=df.replace("?", np.nan),
+                    columns=str_cols
+                    )[list(train_model.preprocessor.feature_names_in_)]
+                    )
 
             trained_metric = get_classification_score(y_true, y_trained_pred)
             latest_metric = get_classification_score(y_true, y_latest_pred)

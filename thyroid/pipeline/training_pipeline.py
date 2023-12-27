@@ -4,7 +4,8 @@ from thyroid.entity.config_entity import (
     DataValidationConfig,
     DataTransformationConfig,
     ModelTrainerConfig,
-    ModelEvaluationConfig
+    ModelEvaluationConfig,
+    ModelPusherConfig
 )
 
 from thyroid.entity.artifact_entity import (
@@ -12,7 +13,8 @@ from thyroid.entity.artifact_entity import (
     DataValidationArtifact,
     DataTransformationArtifact,
     ModelTrainerArtifact,
-    ModelEvaluationArtifact
+    ModelEvaluationArtifact,
+    ModelPusherArtifact
 )
 
 from thyroid.exception import ThyroidException
@@ -23,7 +25,7 @@ from thyroid.component.data_validation import DataValidation
 from thyroid.component.data_transformation import DataTransformation
 from thyroid.component.model_trainer import ModelTrainer
 from thyroid.component.model_evaluation import ModelEvaluation
-
+from thyroid.component.model_pusher import ModelPusher
 
 import sys
 
@@ -134,6 +136,24 @@ class TrainPipeline:
         except  Exception as e:
             raise  ThyroidException(e,sys)
 
+    def start_model_pusher(self,model_eval_artifact:ModelEvaluationArtifact):
+        try:
+            model_pusher_config = ModelPusherConfig(
+                training_pipeline_config=self.training_pipeline_config
+                )
+            
+            model_pusher = ModelPusher(
+                model_pusher_config, 
+                model_eval_artifact
+                )
+            
+            model_pusher_artifact = model_pusher.initiate_model_pusher()
+            
+            return model_pusher_artifact
+        
+        except  Exception as e:
+            raise  ThyroidException(e,sys)
+
     def run_pipeline(self):
         try:
             data_ingestion_artifact = self.start_data_ingestion()
@@ -150,9 +170,13 @@ class TrainPipeline:
                 data_transformation_artifact=data_transformation_artifact
                 )
             
-            model_evaluation_artifact = self.start_model_evaluation(
+            model_eval_artifact = self.start_model_evaluation(
                 data_validation_artifact=data_validation_artifact, 
                 model_trainer_artifact=model_trainer_artifact
+                )
+            
+            model_pusher_artifact = self.start_model_pusher(
+                model_eval_artifact=model_eval_artifact
                 )
 
         except Exception as e:
