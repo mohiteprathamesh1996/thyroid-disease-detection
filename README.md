@@ -14,11 +14,7 @@ This repository contains a data science project aiming to predict the risk of th
 
     ```bash
     conda create -p venv python=3.8 -y
-    ```
-
-    And the activate using:
-
-    ```bash
+    
     conda activate venv/
     ```
 
